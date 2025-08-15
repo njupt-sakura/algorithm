@@ -1,0 +1,70 @@
+# prototype
+
+- prototype 是 (构造) 函数的专有属性
+- prototype 定义: 提供共享属性的对象
+- 不是所有的函数都有 prototype 属性, 函数 bind() 方法返回的函数没有 prototype 属性
+
+```js
+Boolean.__proto__ === Function.prototype;
+Number.__proto__ === Function.prototype;
+String.__proto__ === Function.prototype;
+Object.__proto__ === Function.prototype;
+Function.__proto__ === Function.prototype;
+
+Object.prototype.__proto__ === null;
+Object.__proto__.__proto__ === Function.prototype.__proto__;
+```
+
+原型对象的属性或方法可以修改
+
+```js
+function Demo() {}
+Demo.prototype.name = "demo";
+const demo = new Demo();
+console.log(demo.name); // demo
+Demo.prototype.name = "demo2";
+console.log(demo.name); // demo2
+```
+
+new 一个对象时做了什么
+
+1. 创建一个空对象
+2. 将空对象的 `__proto__` 指向构造函数的 prototype 属性
+3. 将构造函数的 this 指向新创建的对象
+4. 如果构造函数没有返回值, 则实际构造的是新对象
+5. 如果构造函数返回值是引用类型, 则实际构造的是返回值
+6. 如果构造函数返回值是基本类型, 则忽略返回值, 实际构造的是新对象
+
+实现 new 操作
+
+```js
+function myNew(constructor_, ...args) {
+  const obj = Object.create(constructor_.prototype);
+  const ret = constructor_.apply(obj /** this */, args);
+  return typeof ret === "object" && ret !== null ? ret : obj;
+}
+
+function Demo(name, age) {
+  this.name = name;
+  this.age = age;
+  this.say = function () {
+    console.log(this.name, this.age);
+  };
+}
+
+Demo.prototype.name2 = "aaa";
+Demo.prototype.age2 = 22;
+Demo.prototype.say2 = function () {
+  console.log(this.__proto__.name2, this.__proto__.age2);
+};
+
+const demo = myNew(Demo /** constructor_ */, "bbb" /** name */, 23 /** age */);
+console.log(demo.name, demo.name2); // aaa bbb
+console.log(demo.age, demo.age2); // 22 23
+demo.say(); // aaa 22
+demo.say2(); // bbb 23
+
+Demo.prototype.name2 = "ccc";
+Demo.prototype.age2 = 24;
+demo.say2(); // ccc 24
+```

@@ -1,0 +1,16 @@
+**/.idea/
+**/.DS_Store
+**/target/
+**/node_modules/
+**/build/
+**/dist/
+**/*.tar.gz
+**/*.tar
+**/.zip
+**/__cache__/
+**/.cache/
+**/out/
+
+**/.mypy_cache/
+**/.next/
+**/_pagefind/
